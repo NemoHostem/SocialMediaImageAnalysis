@@ -2,9 +2,11 @@ import sqlite3 as lite
 import pickle as pkl
 import numpy as np
 import json
+import os
+import sys
 
-dbs_A_path = 'SIPD18/DSA'
-dbs_B_path = 'SIPD18/DSB'
+dbs_A_path = os.path.join(sys.path[0], '/SIPD18/DSA')
+dbs_B_path = os.path.join(sys.path[0], '/SIPD18/DSB')
 
 
 def get_user_info(db,us_id):
@@ -93,7 +95,7 @@ def load_social_features(ids_list, path_A, path_B):
 #   time:         timestamp related to the engagement score
 #   engagement:   engagement score (i.e., views, comments or favorites) at timestamp 'time'
 
-with open('Engagement/views_30_days.pickle','rb') as f:
+with open(os.path.join(sys.path[0], '/Engagement/views_30_days.pickle'),'rb') as f:
     data = pkl.load(f)
     flickr_ids = [x[0] for x in data]
     sequences = [x[2] for x in data]
