@@ -14,6 +14,7 @@ from sklearn import discriminant_analysis
 from sklearn.metrics import accuracy_score
 from sklearn import neighbors, svm, linear_model
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, ExtraTreesClassifier, GradientBoostingClassifier
+import pandas as pd
 
 path = ''
 
@@ -24,6 +25,10 @@ y_train_data = np.genfromtxt(path+"groups.csv", delimiter=",", dtype=[("id",np.u
 y_train_orig = y_train_data["surface"]
 """
 X_train_orig = X
+y_train_orig = []
+
+for d in data:
+    y_train_orig.append(d[2][-1])
 
 #%% 2. Create an index of class names.
 
@@ -32,21 +37,25 @@ le.fit(y_train_orig)
 y_train = le.transform(y_train_orig)
 
 #%% 3. Split to training and testing.
-groups = y_train_data["group_id"]
+
+#groups = pd.groupby(y_train_orig)
 res = np.empty([10,100])
 
 for r in range(100):
 
-    train, test = next(GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=r).split(X_train_orig, groups=groups))
-    X_train, X_test, y_train, y_test = X_train_orig[train], X_train_orig[test], y_train_orig[train], y_train_orig[test]
+    #train, test = next(GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=r).split(X_train_orig, groups=groups))
+    X_train, X_test, y_train, y_test = X_train_orig[:int(len(X_train_orig)/2)], X_train_orig[int(len(X_train_orig)/2):], y_train_orig[:int(len(y_train_orig)/2)], y_train_orig[int(len(y_train_orig)/2):]
 
 
-    X_train1 = np.array([x.ravel() for x in X_train])
-    X_test1 = np.array([x.ravel() for x in X_test])
+    
+    X_train = np.array(X_train).astype(int)
+    X_test = np.array(X_test).astype(int)
+    y_train = np.array(y_train).astype(int)
+    y_test = np.array(y_test).astype(int)
 
-
-    X_train2 = np.mean(X_train,axis=2)
-    X_test2 = np.mean(X_test,axis=2)
+    """
+    X_train2 = np.mean(X_train1,axis=2)
+    X_test2 = np.mean(X_test1,axis=2)
 
 
     X_train = np.std(X_train,axis=2)
@@ -54,6 +63,7 @@ for r in range(100):
     
     X_test = np.std(X_test,axis=2)
     X_test = np.concatenate((X_test2, X_test), axis=1)
+    """
     
     
 
@@ -71,9 +81,12 @@ for r in range(100):
     classifiers_names = ["1-NN","5-NN","LDA","Linear SVC","RBF SVC","Logistic Regression","RandomForest","AdaBoost","Extra Trees","GB-Trees"]
     
     for i, classifier in enumerate(classifiers):
+        #try:
         classifier.fit(X_train,y_train)
         res[i][r] = (accuracy_score(y_test, classifier.predict(X_test)))
         print(classifiers_names[i]+": "+str(100*accuracy_score(y_test, classifier.predict(X_test)))+" %")
+        #except ValueError:
+        print(classifiers_names[i])
     
 #%% Print mean, min and max of each classifier
         

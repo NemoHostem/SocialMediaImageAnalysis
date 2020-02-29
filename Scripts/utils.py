@@ -2,11 +2,9 @@ import sqlite3 as lite
 import pickle as pkl
 import numpy as np
 import json
-import os
-import sys
 
-dbs_A_path = os.path.join(sys.path[0], '/SIPD18/DSA')
-dbs_B_path = os.path.join(sys.path[0], '/SIPD18/DSB')
+dbs_A_path = 'C://Users/Matias/Documents/Projects/Kotitehtävät/SGN-33007 Media Analysis/SIPD18/DSA'
+dbs_B_path = 'C://Users/Matias/Documents/Projects/Kotitehtävät/SGN-33007 Media Analysis/SIPD18/DSB'
 
 
 def get_user_info(db,us_id):
@@ -60,24 +58,26 @@ def load_social_features(ids_list, path_A, path_B):
     print("\nLoading features:")
 
     HD = []
-    for flickr_id in ids_list:
-        print('\n')
+    for i, flickr_id in enumerate(ids_list):
+        if (i % 100 == 0):
+            print(".", end="")
+        #print('\n')
         try:
             im_idx = DS_A.index(flickr_id)        
-            print("FlickrId:\t"+flickr_id+"\tin dataset A.")
+            #print("FlickrId:\t"+flickr_id+"\tin dataset A.")
             HD = HD_A
             db_path = path_A
         except ValueError:
             im_idx = DS_B.index(flickr_id)        
-            print("FlickrId:\t"+flickr_id+"\tin dataset B.")
+            #print("FlickrId:\t"+flickr_id+"\tin dataset B.")
             HD = HD_B
             db_path = path_B
 
         user_id = HD[im_idx][1]
-        print("Getting user info...")
+        #print("Getting user info...")
         user_feat = get_user_info(db_path+'/user_info.db',user_id)
     
-        print("Getting image info...")
+        #print("Getting image info...")
         image_feat, _ = get_image_info(db_path+'/image_info.db',flickr_id)
             
         feat_data.append(list(user_feat) + list(image_feat))
@@ -95,7 +95,7 @@ def load_social_features(ids_list, path_A, path_B):
 #   time:         timestamp related to the engagement score
 #   engagement:   engagement score (i.e., views, comments or favorites) at timestamp 'time'
 
-with open(os.path.join(sys.path[0], '/Engagement/views_30_days.pickle'),'rb') as f:
+with open('C://Users/Matias/Documents/Projects/Kotitehtävät/SGN-33007 Media Analysis/SIPD18/Engagement/views_30_days.pickle','rb') as f:
     data = pkl.load(f)
     flickr_ids = [x[0] for x in data]
     sequences = [x[2] for x in data]
